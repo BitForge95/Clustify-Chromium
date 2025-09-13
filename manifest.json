@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Clustify",
+  "version": "1.1",
+  "description": "Delete emails by keyword and AI-assisted auto labeling.",
+  "permissions": [
+    "identity",
+    "storage",
+    "https://gmail.googleapis.com/*",
+    "https://www.googleapis.com/*",
+    "https://accounts.google.com/*"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icons/logo.png",
+      "48": "icons/logo.png",
+      "128": "icons/logo.png"
+    },
+    "default_title": "MailPilot Cleanup",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "mailpilot-cleanup@example.com"
+    }
+  }
+}

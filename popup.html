@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clustify</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Clustify</h2>
+    <button id="authBtn">Connect Gmail</button>
+    <button id="logoutBtn">Log Out</button>
+
+
+    <div class="custom-keyword-section">
+      <h3>Custom Keyword Search</h3>
+      <input type="text" id="keywordInput" placeholder="Enter keyword (e.g., 'unsubscribe')">
+      <div>
+        <input type="checkbox" id="subjectOnlyCheckbox">
+        <label for="subjectOnlyCheckbox">Search in subject only</label>
+      </div>
+      <div class="button-group">
+        <button id="countKeywordBtn" disabled class="count-btn">Count by Keyword</button>
+        <button id="deleteKeywordBtn" disabled>Delete by Keyword</button>
+      </div>
+    </div>
+
+    <div class="labeler-section">
+      <h3>AI Auto-Label</h3>
+      <input type="text" id="labelNameInput" placeholder="Enter label (e.g., 'Travel Receipts')" />
+      <div class="button-group">
+        <button id="generateKeywordsBtn" disabled class="count-btn">Suggest Keywords</button>
+        <button id="applyAutoLabelBtn" disabled>Preview & Apply Label</button>
+      </div>
+      <textarea id="generatedKeywords" rows="3" placeholder="Keywords will appear here" readonly></textarea>
+    </div>
+
+    <p id="status"></p>
+
+    <div id="previewModal" style="display:none;">
+      <div id="previewContent">
+        <h3>Email Subjects to Delete / Label</h3>
+        <ul id="previewList"></ul>
+        <button id="previewDeleteBtn">Delete</button>
+        <button id="previewCancelBtn">Cancel</button>
+      </div>
+    </div>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
