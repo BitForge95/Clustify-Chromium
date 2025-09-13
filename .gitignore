@@ -63,3 +63,7 @@ build/Release
 *.bak
 *.backup
 *.old
+
+# Node package files 
+package.json
+package-lock.json
