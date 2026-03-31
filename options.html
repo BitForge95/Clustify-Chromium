@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Clustify Settings</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Adding a little extra styling specifically for the options page */
+    body { width: 400px; padding: 20px; }
+    .settings-group { margin-bottom: 20px; }
+    input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+
+</head>
+<body>
+  <div class="container">
+    <h2>⚙️ Clustify Settings</h2>
+    
+    <div class="settings-group">
+      <label for="apiKey"><strong>Groq API Key (Required for AI features)</strong></label>
+      <p style="font-size: 12px; color: #666;">
+        Get your free API key from <a href="https://console.groq.com/keys" target="_blank">console.groq.com</a>
+      </p>
+      <input type="password" id="apiKey" placeholder="gsk_..." />
+    </div>
+
+    <button id="saveBtn" style="background-color: #34a853;">Save Settings</button>
+    <p id="status" style="margin-top: 10px; font-weight: bold;"></p>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html>

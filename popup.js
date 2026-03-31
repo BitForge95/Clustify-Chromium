@@ -1,6 +1,5 @@
 const browser = typeof chrome !== "undefined" ? chrome : undefined;
 
-
 const authBtn = document.getElementById("authBtn");
 const status = document.getElementById("status");
 const keywordInput = document.getElementById("keywordInput");
@@ -180,6 +179,7 @@ countKeywordBtn.addEventListener("click", async () => {
     return;
   }
 
+  // Security Note: encodeURIComponent in the fetch call handles special characters safely
   const isSubjectOnly = subjectOnlyCheckbox.checked;
   const query = isSubjectOnly ? `subject:("${keyword}")` : `"${keyword}"`;
   
@@ -187,6 +187,7 @@ countKeywordBtn.addEventListener("click", async () => {
 
   await countEmailsByQuery(query, description);
 });
+
 deleteKeywordBtn.addEventListener("click", async () => {
   const keyword = keywordInput.value.trim();
   if (!keyword) {
@@ -205,15 +206,24 @@ deleteKeywordBtn.addEventListener("click", async () => {
     await deleteEmailsByQuery(query, description);
   }
 });
+
 async function aiSuggestKeywords(labelName) {
-  status.textContent = "Asking Groq LLaMA for keywords...";
+  status.textContent = "Asking AI for keywords...";
   if (previewDeleteBtn) previewDeleteBtn.textContent = "Apply";
 
   try {
+    // SECURITY FIX: Retrieve user's own API key from storage rather than hardcoding
+    const stored = await browser.storage.local.get(['groqApiKey']);
+    const apiKey = stored.groqApiKey;
+
+    if (!apiKey) {
+      throw new Error("No Groq API Key found. Please add it in options.");
+    }
+
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer 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`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -238,19 +248,14 @@ async function aiSuggestKeywords(labelName) {
 
     if (kws.length) return kws;
   } catch (e) {
-    console.warn("Groq AI unavailable, using fallback.", e);
+    console.warn("AI unavailable, using fallback.", e);
+    status.textContent = e.message;
   }
 
+  // Fallback logic
   const base = (labelName || "").toLowerCase().trim();
   const words = Array.from(new Set(base.split(/[\s\-_/]+/).filter(Boolean)));
-
-  const synonyms = {
-    
-  };
-
   let out = [...words];
-  words.forEach(w => { if (synonyms[w]) out.push(...synonyms[w]); });
-
   if (base && !out.includes(base)) out.push(base);
   out = Array.from(new Set(out)).slice(0, 20);
   return out;
@@ -389,3 +394,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     else updateUIState(false);
   } catch { updateUIState(false); }
 });
+
+const openSettingsBtn = document.getElementById("openSettingsBtn");
+if (openSettingsBtn) {
+  openSettingsBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    // This safely opens the options.html page in a new browser tab
+    if (browser.runtime.openOptionsPage) {
+      browser.runtime.openOptionsPage();
+    } else {
+      window.open(browser.runtime.getURL('options.html'));
+    }
+  });
+}
