@@ -86,10 +86,30 @@ _browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   
   if (message.action === "clearToken") {
-    // Updated to clear session storage
-    _browser.storage.session.remove(['authToken', 'tokenExpiry'])
-      .then(() => sendResponse({ success: true }))
-      .catch(error => sendResponse({ success: false, error: error.message }));
+    console.log("🗑️ Revoking and clearing stored token");
+    
+    _browser.storage.session.get(['authToken'])
+      .then(stored => {
+        // 1. If we have a token, tell Google's servers to officially revoke it
+        if (stored.authToken) {
+          fetch(`https://oauth2.googleapis.com/revoke?token=${stored.authToken}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          }).catch(err => console.error("Failed to revoke token with Google:", err));
+        }
+        
+        // 2. Clear it from the extension's local session memory
+        return _browser.storage.session.remove(['authToken', 'tokenExpiry']);
+      })
+      .then(() => {
+        console.log("✅ Token fully cleared and revoked");
+        sendResponse({ success: true });
+      })
+      .catch(error => {
+        console.error("❌ Error during logout:", error);
+        sendResponse({ success: false, error: error.message });
+      });
+    
     return true;
   }
 });
