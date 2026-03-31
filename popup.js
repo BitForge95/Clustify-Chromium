@@ -107,27 +107,37 @@ async function getAllMessageIds(query) {
 async function deleteEmailsByQuery(query, description) {
   const ids = await getAllMessageIds(query);
   if (ids.length === 0) {
-    status.textContent = `No ${description} found to delete `;
+    status.textContent = `No ${description} found to delete 🎉`;
     return;
   }
 
-  status.textContent = `Deleting ${ids.length} ${description}... `;
+  status.textContent = `Moving ${ids.length} ${description} to Trash... 🗑️`;
   const batchSize = 1000;
   let deletedCount = 0;
 
   for (let i = 0; i < ids.length; i += batchSize) {
     const batch = ids.slice(i, i + batchSize);
-    const deleteRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/batchDelete", {
+    
+    const deleteRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/batchModify", {
       method: "POST",
       headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ ids: batch })
+      body: JSON.stringify({ 
+        ids: batch,
+        addLabelIds: ["TRASH"] 
+      })
     });
-    if (!deleteRes.ok) throw new Error(`Failed to delete batch: ${deleteRes.status}`);
+    
+    if (!deleteRes.ok) {
+      const errorData = await deleteRes.json();
+      throw new Error(`Failed to trash emails: ${errorData.error?.message || deleteRes.status}`);
+    }
+    
     deletedCount += batch.length;
-    status.textContent = `Deleted ${deletedCount} of ${ids.length} ${description}... `;
+    status.textContent = `Moved ${deletedCount} of ${ids.length} ${description} to Trash... 🗑️`;
   }
 
-  status.textContent = `Deleted ${deletedCount} ${description} `;
+  // UPDATED: The success message now includes the reminder to empty the trash
+  status.textContent = `Moved ${deletedCount} ${description} to Trash! Note: Don't forget to empty your Gmail Trash bin!`;
 }
 
 async function countEmailsByQuery(query, description) {
